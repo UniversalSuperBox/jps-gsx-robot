@@ -1,0 +1,8 @@
+from os import environ
+
+# This configuration is documented in README.md
+
+JAMF_USERNAME = environ["JAMF_USERNAME"]
+JAMF_PASSWORD = environ["JAMF_PASSWORD"]
+JAMF_URL = environ["JAMF_URL"]
+JAMF_DEVICE_SEARCH = environ["JAMF_DEVICE_SEARCH"]
