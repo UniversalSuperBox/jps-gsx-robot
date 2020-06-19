@@ -2,7 +2,11 @@
 
 Your friendly neighborhood giant death robot bent on nothing but destroying your tedious Apple Global Service Exchange import to Jamf Pro Server.
 
-jps-gsx-robot takes the ID of a mobile device search. It then runs through the GSX Inventory Lookup bulk action on the mobile device search's resultset, just like you would do in your browser. All devices with new data (those that appear in the first tab of the results screen) will be updated when the script is finished.
+jps-gsx-robot takes the ID of an advanced search. It then runs through the GSX Inventory Lookup bulk action on the search's resultset, just like you would do in your browser. All devices with new data (those that appear in the first tab of the results screen) will be updated when the script is finished.
+
+It outputs the serial numbers it is about to update to stdout, all other logging is printed to stderr.
+
+The robot is exactly purpose-built and is based off of reverse-engineering the GSX lookup process. It may break with any new JPS version, minor or major. Watch any scheduled jobs carefully, especially around upgrade time!
 
 ## Prerequisites
 
@@ -56,9 +60,13 @@ This URL points to the base of your JPS. For example, `https://jps.mydomain.tld:
 
 These values specify the username and password used to sign in to the JPS. This user must have the permissions needed to view Advanced Computer Searches and Advanced Device Searches, and must be able to update GSX records for all of these. We're still unsure exactly what these needed permissions are.
 
-#### JAMF_DEVICE_SEARCH
+#### JAMF_SEARCH_TYPE
 
-Contains the ID of a mobile device search. jps-gsx-robot will read this list of devices and initiate the GSX inventory lookup on them.
+Contains "mobiledevice" or "computer", for the type of search that you will be executing jps-gsx-robot on.
+
+#### JAMF_SEARCH_ID
+
+Contains the ID of an advanced search. The type of search (computer or mobile device) is determined by JAMF_SEARCH_TYPE. jps-gsx-robot will read this list of devices and initiate the GSX inventory lookup on them.
 
 ### Run jps-gsx-robot
 
