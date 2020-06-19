@@ -118,7 +118,9 @@ search_action_assistant_ajax = "{base}/{type}SearchActionAssistant.ajax".format(
 )
 
 
-eprint("Receiving one-time session information by opening the search's 'Action' page...")
+eprint(
+    "Receiving one-time session information by opening the search's 'Action' page..."
+)
 search_action_list = session.get(
     search_action_assistant_html, cookies=cookies, params=uuid_params,
 )
@@ -146,6 +148,11 @@ gsx_action_start = session.post(
 gsx_action_start.raise_for_status()
 gsx_action_start = None
 
+# It is Very Hard (tm) to figure out if the advanced search we are looking at
+# has any items in it. If it has zero items, however, it will allow us to start
+# the GSX search but will forever hang at 0%. We need to check for this
+# situation and fail if it occurs.
+loops_without_changed_percentage = 0
 while True:
     time.sleep(2)
     gsx_action_monitor = session.post(
@@ -167,7 +174,19 @@ while True:
         eprint("GSX search is complete, determining devices to update...")
         break
 
-    eprint(monitor_soup.find("percent").text + "% finished")
+    current_progress = monitor_soup.find("percent").text
+    if current_progress == "0":
+        loops_without_changed_percentage += 1
+
+    if loops_without_changed_percentage >= 60:
+        eprint("Waited for 2 minutes without loop percentage moving off of 0.")
+        eprint(
+            "Your advanced device search is either too large or contains zero devices."
+        )
+        eprint("This is not necessarily a failure, so I'll exit with success.")
+        sys.exit(0)
+
+    eprint(current_progress + "% finished")
 
 # Now that the action is done, we can retrieve the table of results.
 gsx_action_results = session.post(
